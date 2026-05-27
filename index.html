@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Skincare Stage Gate Manager</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="product-rail">
+        <div class="brand-lockup">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <h1>Stage Gate Manager</h1>
+            <p>Skincare product development</p>
+          </div>
+        </div>
+
+        <div class="product-actions">
+          <button id="addProductBtn" class="primary-button" type="button">+ Product</button>
+          <button id="resetDemoBtn" class="ghost-button" type="button">Reset</button>
+        </div>
+
+        <nav class="app-nav" aria-label="Workspace pages">
+          <button id="trackerPageBtn" class="nav-button active" type="button">Stage Tracker</button>
+          <button id="raciPageBtn" class="nav-button" type="button">RACI Matrix</button>
+        </nav>
+
+        <div id="productList" class="product-list" aria-label="Products"></div>
+      </aside>
+
+      <main class="workspace">
+        <div id="trackerPage" class="page active">
+          <section class="product-header">
+            <div class="product-title">
+              <label for="productName">Product</label>
+              <input id="productName" type="text" />
+            </div>
+            <div class="header-grid">
+              <label>
+                Owner
+                <input id="productOwner" type="text" />
+              </label>
+              <label>
+                Target launch
+                <input id="targetLaunch" type="date" />
+              </label>
+              <label>
+                Current gate
+                <input id="currentGate" type="text" readonly />
+              </label>
+              <label>
+                Gate health
+                <input id="gateHealth" type="text" readonly />
+              </label>
+            </div>
+          </section>
+
+          <section class="summary-strip" aria-label="Gate summary">
+            <div>
+              <span id="completeCount">0</span>
+              <small>Stages complete</small>
+            </div>
+            <div>
+              <span id="readyCount">0</span>
+              <small>Ready now</small>
+            </div>
+            <div>
+              <span id="blockedCount">0</span>
+              <small>Blocked</small>
+            </div>
+            <div>
+              <span id="forecastCm">0%</span>
+              <small>Base CM</small>
+            </div>
+          </section>
+
+          <section class="stage-layout">
+            <div id="stageCards" class="stage-cards"></div>
+          </section>
+        </div>
+
+        <div id="raciPage" class="page">
+          <section class="raci-header">
+            <div>
+              <p class="eyebrow">Operating model</p>
+              <h2>RACI Matrix by Stage</h2>
+              <p>Customize roles, named people, and stage-level responsibility assignments as your company decides who owns each gate.</p>
+            </div>
+            <button id="addRaciRoleBtn" class="primary-button" type="button">+ Role</button>
+          </section>
+
+          <section class="raci-definitions" aria-label="RACI definitions">
+            <div><strong>A</strong><span>Accountable. Owns the go/no decision at the gate. One person only.</span></div>
+            <div><strong>R</strong><span>Responsible. Does the work and delivers outputs for this stage.</span></div>
+            <div><strong>C</strong><span>Consulted. Provides input with two-way communication before decisions.</span></div>
+            <div><strong>I</strong><span>Informed. Kept up to date with one-way communication after decisions.</span></div>
+          </section>
+
+          <section class="raci-table-wrap">
+            <table class="raci-table">
+              <thead>
+                <tr id="raciHead"></tr>
+              </thead>
+              <tbody id="raciBody"></tbody>
+            </table>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <template id="stageTemplate">
+      <article class="stage-card">
+        <div class="stage-topline">
+          <div>
+            <p class="stage-number"></p>
+            <h2></h2>
+          </div>
+          <span class="stage-status"></span>
+        </div>
+        <p class="stage-purpose"></p>
+        <div class="criteria-list"></div>
+        <div class="input-grid"></div>
+        <div class="stage-actions">
+          <button class="back-button" type="button">Move Back</button>
+          <button class="advance-button" type="button">Advance</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>
