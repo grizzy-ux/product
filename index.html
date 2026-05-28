@@ -99,23 +99,44 @@
         </section>
 
         <section id="detailPage" class="page">
-          <section class="page-header">
+          <section class="detail-hero">
             <div>
               <p class="eyebrow">Product workspace</p>
               <h2 id="detailTitle">Product Detail</h2>
-              <p>Click a product in the left rail or summary table, then manage vendor, formula, packaging, testing, notes, and stage evidence here.</p>
+              <p id="detailSubtitle">Commercialization snapshot, critical path, and gate evidence.</p>
+            </div>
+            <div class="detail-hero-actions">
+              <span id="detailCurrentStatus" class="status-pill"></span>
+              <button id="detailOpenPipelineBtn" class="primary-button" type="button">Open Gate Work</button>
             </div>
           </section>
-          <section class="detail-grid">
-            <label>Vendor / CM<input id="detailVendor" type="text" /></label>
-            <label>Formula round<input id="detailFormulaRound" type="text" /></label>
-            <label>Packaging status<select id="detailPackagingStatus"></select></label>
-            <label>Testing status<select id="detailTestingStatus"></select></label>
-            <label>Target launch<input id="detailLaunch" type="date" /></label>
-            <label>Hero claim<input id="detailHeroClaim" type="text" /></label>
+
+          <section id="detailMetrics" class="detail-metrics" aria-label="Product detail metrics"></section>
+
+          <section class="detail-workspace">
+            <div class="detail-card detail-fields-card">
+              <div class="section-title"><h3>Operating Details</h3></div>
+              <div class="detail-grid">
+                <label>Vendor / CM<input id="detailVendor" type="text" /></label>
+                <label>Formula round<input id="detailFormulaRound" type="text" /></label>
+                <label>Packaging status<select id="detailPackagingStatus"></select></label>
+                <label>Testing status<select id="detailTestingStatus"></select></label>
+                <label>Target launch<input id="detailLaunch" type="date" /></label>
+                <label>Hero claim<input id="detailHeroClaim" type="text" /></label>
+              </div>
+            </div>
+
+            <div class="detail-card">
+              <div class="section-title"><h3>Gate Timeline</h3></div>
+              <div id="detailTimeline" class="detail-timeline"></div>
+            </div>
           </section>
-          <section class="panel-block">
-            <div class="section-title"><h3>All Stages</h3></div>
+
+          <section class="panel-block detail-stage-panel">
+            <div class="section-title">
+              <h3>Gate Evidence</h3>
+              <span id="detailEvidenceSummary" class="muted-label"></span>
+            </div>
             <div id="detailStages" class="detail-stage-list"></div>
           </section>
         </section>
@@ -189,6 +210,6 @@
       </article>
     </template>
 
-    <script src="app.js"></script>
+    <script src="app.js?v=20260528-eight-gates"></script>
   </body>
 </html>

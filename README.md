@@ -8,12 +8,14 @@ The app is designed for early operating-model work: it runs as a static site, st
 
 - Portfolio summary page for daily operating review
 - Output-driven gate process:
-  - Find the Idea
-  - Build the Business Case
-  - Product Development
+  - Ideation
+  - Validation
+  - Formulation Development
   - Packaging Development
-  - Test and Validate
-  - Launch and Learn
+  - Testing & Validation
+  - Commercialization Planning
+  - Launch Readiness
+  - Post-Launch Review
 - Required decisions, required documents, owners, blockers, notes, and go/no-go criteria per gate
 - Gate criteria with locked advance buttons until outputs are met
 - Editable product inputs and product switching

@@ -1,4 +1,5 @@
-const STORAGE_KEY = "skincare-commercialization-os-v2";
+const STORAGE_KEY = "skincare-commercialization-os-v3-eight-gates";
+const LEGACY_STORAGE_KEYS = ["skincare-commercialization-os-v2", "skincare-stage-gate-manager-v1"];
 
 const statusValues = [
   "Not Started",
@@ -14,12 +15,12 @@ const raciValues = ["", "A", "R", "C", "I"];
 
 const gates = [
   {
-    title: "Find the Idea",
-    purpose: "Decide whether the idea is differentiated, fits Marin's positioning, and deserves further investment.",
+    title: "Ideation",
+    purpose: "Capture the product idea, customer problem, brand fit, and initial reason to believe before deeper validation work.",
     defaultOwner: "Product Lead",
-    decisions: ["Problem and target customer are clear", "Differentiation vs. market is compelling", "Marine glycoprotein story fits"],
-    documents: ["Idea brief", "Competitive scan", "Initial opportunity note"],
-    criteria: ["No obvious duplicate in market", "Fits brand and science platform", "Upside justifies deeper business case"],
+    decisions: ["Target customer and problem are clear", "Idea fits Marin positioning", "Initial opportunity is worth validating"],
+    documents: ["Idea brief", "Competitive scan", "Initial risk note"],
+    criteria: ["Differentiated from existing market options", "Connects to marine glycoprotein platform", "Upside justifies validation work"],
     fields: [
       { key: "ideaSummary", label: "Idea summary", type: "textarea", span: "wide" },
       { key: "marketDifference", label: "Market difference", type: "textarea", span: "wide" },
@@ -28,12 +29,12 @@ const gates = [
     ],
   },
   {
-    title: "Build the Business Case",
-    purpose: "Pressure-test opportunity size, risks, and contribution margin across conservative, base, and optimistic cases.",
+    title: "Validation",
+    purpose: "Validate the opportunity, customer need, business case, and go-forward rationale before funding development.",
     defaultOwner: "Commercial Lead",
-    decisions: ["Target price is approved", "Channel assumption is approved", "Business case is worth funding"],
-    documents: ["One-page financial model", "Risk register", "Pricing recommendation"],
-    criteria: ["Base contribution margin meets threshold", "Conservative case does not break the project", "Top risks have mitigation owners"],
+    decisions: ["Opportunity size is attractive", "Target price and channel assumptions are approved", "Business case is worth funding"],
+    documents: ["Validation readout", "One-page financial model", "Risk register"],
+    criteria: ["Base contribution margin meets threshold", "Top risks have mitigation owners", "Consumer or market signal supports moving forward"],
     fields: [
       { key: "opportunitySize", label: "Opportunity size", type: "textarea", span: "wide" },
       { key: "businessRisks", label: "Business risks", type: "textarea", span: "wide" },
@@ -43,12 +44,12 @@ const gates = [
     ],
   },
   {
-    title: "Product Development",
-    purpose: "Develop the formula, technical path, consumer direction, claims plan, and safety evidence.",
+    title: "Formulation Development",
+    purpose: "Develop and select the formula direction with technical feasibility, early consumer input, claims path, and safety evidence.",
     defaultOwner: "R&D / Formulation",
     decisions: ["Formula direction is selected", "Must-win performance specs are met", "Claims path is viable"],
-    documents: ["Product brief", "Formula round notes", "Safety and derm testing evidence"],
-    criteria: ["Contract manufacturer technical track is active", "Margin check passes against pricing", "Safety and dermatology testing are complete"],
+    documents: ["Product brief", "Formula round notes", "Safety and derm testing plan"],
+    criteria: ["Contract manufacturer technical track is active", "Margin check passes against pricing", "Safety and dermatology requirements are defined or complete"],
     fields: [
       { key: "manufacturer", label: "Contract manufacturer", type: "text" },
       { key: "formulaDirection", label: "Selected formula direction", type: "text" },
@@ -60,7 +61,7 @@ const gates = [
   },
   {
     title: "Packaging Development",
-    purpose: "Manage components, artwork, supplier timing, compatibility, and line-readiness without forcing the same timeline as formula work.",
+    purpose: "Manage components, artwork, supplier timing, compatibility, and line-readiness on its own timeline.",
     defaultOwner: "Packaging / Operations",
     decisions: ["Pack architecture is approved", "Supplier and component path are approved", "Artwork route is approved"],
     documents: ["Packaging brief", "Supplier quote or MOQ summary", "Compatibility and line-trial evidence"],
@@ -75,8 +76,8 @@ const gates = [
     ],
   },
   {
-    title: "Test and Validate",
-    purpose: "Validate product and pack experience before launch with IHUT, fast packaging comprehension, and final claims documentation.",
+    title: "Testing & Validation",
+    purpose: "Validate product performance, packaging comprehension, claims documentation, and any final rework before launch planning locks.",
     defaultOwner: "Consumer Insights",
     decisions: ["IHUT outcome supports launch", "Packaging comprehension is acceptable", "Claims documentation is final"],
     documents: ["In-home use test readout", "5-second packaging test readout", "Claims final audit"],
@@ -89,17 +90,41 @@ const gates = [
     ],
   },
   {
-    title: "Launch and Learn",
-    purpose: "Launch DTC first, prioritize existing customers, focus on one hero claim, then review 90-day commercial and risk signals.",
+    title: "Commercialization Planning",
+    purpose: "Build the commercial plan across channel, pricing, forecast, demand generation, inventory, and customer sequencing.",
     defaultOwner: "Growth / Commercial",
-    decisions: ["DTC-first launch plan is approved", "One hero claim is locked", "90-day learning agenda is approved"],
-    documents: ["Launch plan", "90-day review", "Post-launch issue log"],
-    criteria: ["Forecast vs. buy-rate is reviewed", "Repurchase and return rates are reviewed", "Contribution margin and safety/regulatory/claims issues are reviewed"],
+    decisions: ["Launch channel sequence is approved", "Forecast and inventory plan are approved", "Pricing and promo guardrails are approved"],
+    documents: ["Commercialization plan", "Forecast and inventory plan", "Launch marketing brief"],
+    criteria: ["DTC-first or channel strategy is explicit", "Existing-customer plan is defined", "Contribution margin remains acceptable"],
+    fields: [
+      { key: "dtcPlan", label: "DTC / channel launch plan", type: "textarea", span: "wide" },
+      { key: "customerPlan", label: "Existing-customer plan", type: "textarea" },
+      { key: "forecastBuyRate", label: "Forecast and buy-rate assumption", type: "textarea" },
+      { key: "commercialRisks", label: "Commercial risks", type: "textarea", span: "wide" },
+    ],
+  },
+  {
+    title: "Launch Readiness",
+    purpose: "Confirm the team is operationally ready to launch with final product, packaging, claims, inventory, service, and go-live checks closed.",
+    defaultOwner: "Operations / Launch Lead",
+    decisions: ["Go-live date is approved", "Hero claim is locked", "Launch checklist is complete"],
+    documents: ["Launch readiness checklist", "Final claims and asset packet", "Inventory and fulfillment confirmation"],
+    criteria: ["No critical open blockers", "Customer-facing assets are final", "Support and issue escalation path is ready"],
     fields: [
       { key: "heroClaim", label: "Hero claim", type: "text" },
-      { key: "dtcPlan", label: "DTC-first launch plan", type: "textarea" },
-      { key: "customerPlan", label: "Existing-customer plan", type: "textarea" },
-      { key: "forecastBuyRate", label: "90-day forecast vs buy rate", type: "textarea" },
+      { key: "launchChecklist", label: "Launch checklist notes", type: "textarea", span: "wide" },
+      { key: "inventoryReadiness", label: "Inventory / fulfillment readiness", type: "textarea" },
+      { key: "supportReadiness", label: "Support and escalation readiness", type: "textarea" },
+    ],
+  },
+  {
+    title: "Post-Launch Review",
+    purpose: "Review 90-day commercial performance, repurchase, returns, actual margin, and safety/regulatory/claims issues surfaced after launch.",
+    defaultOwner: "Growth / Commercial",
+    decisions: ["Scale, iterate, or pause decision is made", "90-day learning agenda is closed", "Post-launch issue response is approved"],
+    documents: ["90-day review", "Post-launch issue log", "Margin and repurchase readout"],
+    criteria: ["Forecast vs. buy-rate is reviewed", "Repurchase and return rates are reviewed", "Contribution margin and safety/regulatory/claims issues are reviewed"],
+    fields: [
       { key: "repurchaseRate", label: "90-day repurchase rate (%)", type: "number" },
       { key: "returnRate", label: "Return rate (%)", type: "number" },
       { key: "actualCm", label: "Actual contribution margin (%)", type: "number" },
@@ -132,6 +157,7 @@ document.querySelector("#exportStagesBtn").addEventListener("click", exportStage
 document.querySelector("#exportRaciBtn").addEventListener("click", exportRaciCsv);
 document.querySelector("#downloadJsonBtn").addEventListener("click", downloadJson);
 document.querySelector("#importJsonBtn").addEventListener("click", importJson);
+document.querySelector("#detailOpenPipelineBtn").addEventListener("click", () => setPage("pipeline"));
 
 navButtons.forEach((button) => button.addEventListener("click", () => setPage(button.dataset.page)));
 
@@ -191,6 +217,8 @@ function createDemoProducts() {
         1: { status: "Approved", owner: "Commercial Lead", decisions: [true, true, true], documents: [true, true, true], criteria: [true, true, true] },
         2: { status: "In Progress", owner: "R&D / Formulation", decisions: [true, false, false], documents: [true, true, false], criteria: [true, true, false], blockers: "Awaiting final flavor allergen and derm review." },
         3: { status: "Waiting on Vendor", owner: "Packaging / Operations", blockers: "Supplier confirming applicator MOQ and lead time." },
+        4: { status: "Not Started", owner: "Consumer Insights" },
+        5: { status: "Not Started", owner: "Growth / Commercial" },
       },
     }),
     createProduct({
@@ -518,6 +546,10 @@ function renderStageActions(card, product, gateIndex, ready) {
 
 function renderDetail(product) {
   document.querySelector("#detailTitle").textContent = product.name || "Product Detail";
+  document.querySelector("#detailSubtitle").textContent = `${gates[product.currentGate].title} · ${product.owner || "Owner unassigned"} · Launch ${product.targetLaunch || "TBD"}`;
+  const currentStatus = document.querySelector("#detailCurrentStatus");
+  currentStatus.textContent = currentGateStatus(product);
+  currentStatus.className = `status-pill ${statusClass(currentGateStatus(product))}`;
   setSelectOptions(document.querySelector("#detailPackagingStatus"), statusValues, product.details.packagingStatus);
   setSelectOptions(document.querySelector("#detailTestingStatus"), statusValues, product.details.testingStatus);
   document.querySelector("#detailVendor").value = product.details.vendor || "";
@@ -525,26 +557,88 @@ function renderDetail(product) {
   document.querySelector("#detailLaunch").value = product.targetLaunch || "";
   document.querySelector("#detailHeroClaim").value = product.details.heroClaim || "";
 
+  renderDetailMetrics(product);
+  renderDetailTimeline(product);
+
   const detailStages = document.querySelector("#detailStages");
   detailStages.innerHTML = "";
   gates.forEach((gate, index) => {
     const data = product.gateData[index];
+    const totals = gateOutputTotals(data);
+    const percent = Math.round((totals.done / totals.total) * 100) || 0;
     const div = document.createElement("article");
     div.className = "detail-stage-card";
     div.innerHTML = `
-      <div>
-        <p>Gate ${index + 1}</p>
-        <h3>${escapeHtml(gate.title)}</h3>
+      <div class="detail-stage-main">
+        <div>
+          <p>Gate ${index + 1}</p>
+          <h3>${escapeHtml(gate.title)}</h3>
+        </div>
+        <span class="status-pill ${statusClass(data.status)}">${escapeHtml(data.status)}</span>
       </div>
-      <span class="status-pill ${statusClass(data.status)}">${escapeHtml(data.status)}</span>
-      <dl>
-        <dt>Owner</dt><dd>${escapeHtml(data.owner || "Unassigned")}</dd>
-        <dt>Blockers</dt><dd>${escapeHtml(data.blockers || "None")}</dd>
-        <dt>Notes</dt><dd>${escapeHtml(data.notes || "None")}</dd>
-      </dl>
+      <div class="detail-progress" aria-label="${percent}% complete"><span style="width: ${percent}%"></span></div>
+      <div class="detail-stage-stats">
+        <span>${totals.decisions}/${gate.decisions.length} decisions</span>
+        <span>${totals.documents}/${gate.documents.length} docs</span>
+        <span>${totals.criteria}/${gate.criteria.length} criteria</span>
+      </div>
+      <div class="detail-stage-meta">
+        <div><strong>Owner</strong><span>${escapeHtml(data.owner || "Unassigned")}</span></div>
+        <div><strong>Blockers</strong><span>${escapeHtml(data.blockers || "None")}</span></div>
+        <div><strong>Notes</strong><span>${escapeHtml(data.notes || "None")}</span></div>
+      </div>
     `;
+    div.addEventListener("click", () => {
+      product.currentGate = index;
+      activePage = "pipeline";
+      persistAndRender();
+    });
     detailStages.append(div);
   });
+
+  const totalOutputs = product.gateData.reduce((sum, data) => sum + gateOutputTotals(data).total, 0);
+  const doneOutputs = product.gateData.reduce((sum, data) => sum + gateOutputTotals(data).done, 0);
+  document.querySelector("#detailEvidenceSummary").textContent = `${doneOutputs}/${totalOutputs} outputs complete`;
+}
+
+function renderDetailMetrics(product) {
+  const approved = product.gateData.filter((gate) => gate.status === "Approved").length;
+  const blockers = countBlockers(product);
+  const ready = product.gateData.filter((gate) => gate.status === "Ready for Gate Review").length;
+  const baseCm = Math.round(computeScenario(product.scenarios.base).cmPercent) || 0;
+  document.querySelector("#detailMetrics").innerHTML = `
+    <div><span>${approved}/${gates.length}</span><small>Approved gates</small></div>
+    <div><span>${ready}</span><small>Ready for review</small></div>
+    <div><span>${blockers}</span><small>Open blockers</small></div>
+    <div><span>${baseCm}%</span><small>Base CM</small></div>
+  `;
+}
+
+function renderDetailTimeline(product) {
+  const timeline = document.querySelector("#detailTimeline");
+  timeline.innerHTML = "";
+  gates.forEach((gate, index) => {
+    const item = document.createElement("button");
+    item.className = `timeline-item ${statusClass(product.gateData[index].status)}${index === product.currentGate ? " current" : ""}`;
+    item.type = "button";
+    item.innerHTML = `<span>${index + 1}</span><strong>${escapeHtml(gate.title)}</strong><small>${escapeHtml(product.gateData[index].status)}</small>`;
+    item.addEventListener("click", () => {
+      product.currentGate = index;
+      activePage = "pipeline";
+      persistAndRender();
+    });
+    timeline.append(item);
+  });
+}
+
+function gateOutputTotals(data) {
+  return {
+    decisions: data.decisions.filter(Boolean).length,
+    documents: data.documents.filter(Boolean).length,
+    criteria: data.criteria.filter(Boolean).length,
+    total: data.decisions.length + data.documents.length + data.criteria.length,
+    done: data.decisions.filter(Boolean).length + data.documents.filter(Boolean).length + data.criteria.filter(Boolean).length,
+  };
 }
 
 function renderRaci() {
@@ -755,12 +849,13 @@ function defaultScenarios(overrides = {}) {
 function defaultRaci() {
   return {
     roles: [
-      { role: "Founder / CEO", person: "", assignments: ["A", "A", "I", "I", "I", "A"] },
-      { role: "Product Lead", person: "", assignments: ["R", "R", "A", "C", "A", "R"] },
-      { role: "R&D / Formulation", person: "", assignments: ["C", "C", "R", "C", "C", "C"] },
-      { role: "Packaging / Operations", person: "", assignments: ["I", "C", "C", "A", "C", "R"] },
-      { role: "Regulatory / Claims", person: "", assignments: ["C", "C", "C", "C", "R", "C"] },
-      { role: "Growth / Marketing", person: "", assignments: ["C", "R", "C", "C", "R", "R"] },
+      { role: "Founder / CEO", person: "", assignments: ["A", "A", "I", "I", "I", "I", "A", "A"] },
+      { role: "Product Lead", person: "", assignments: ["R", "R", "C", "C", "A", "C", "R", "C"] },
+      { role: "R&D / Formulation", person: "", assignments: ["C", "C", "A", "C", "R", "C", "C", "C"] },
+      { role: "Packaging / Operations", person: "", assignments: ["I", "C", "C", "A", "R", "C", "R", "I"] },
+      { role: "Regulatory / Claims", person: "", assignments: ["C", "C", "C", "C", "R", "C", "R", "C"] },
+      { role: "Growth / Marketing", person: "", assignments: ["C", "R", "C", "C", "C", "A", "R", "R"] },
+      { role: "Customer Experience", person: "", assignments: ["I", "C", "I", "I", "C", "C", "R", "R"] },
     ],
   };
 }
@@ -799,9 +894,11 @@ function addProduct() {
 }
 
 function resetDemo() {
+  [STORAGE_KEY, ...LEGACY_STORAGE_KEYS].forEach((key) => localStorage.removeItem(key));
   const products = createDemoProducts();
-  state = normalizeState({ products, activeProductId: products[0].id, activePage, raci: defaultRaci() });
+  state = normalizeState({ products, activeProductId: products[0].id, activePage: "summary", raci: defaultRaci() });
   activeProductId = state.activeProductId;
+  activePage = state.activePage;
   saveState();
   render();
 }
