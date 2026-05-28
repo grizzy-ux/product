@@ -3,19 +3,17 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Skincare Stage Gate Manager</title>
+    <title>Skincare Commercialization OS</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="app-shell">
       <aside class="product-rail">
         <div class="brand-lockup">
-          <div class="brand-mark" aria-hidden="true">
-            <span></span>
-          </div>
+          <div class="brand-mark" aria-hidden="true"><span></span></div>
           <div>
-            <h1>Stage Gate Manager</h1>
-            <p>Skincare product development</p>
+            <h1>Commercialization OS</h1>
+            <p>Skincare stage gates</p>
           </div>
         </div>
 
@@ -25,76 +23,115 @@
         </div>
 
         <nav class="app-nav" aria-label="Workspace pages">
-          <button id="trackerPageBtn" class="nav-button active" type="button">Stage Tracker</button>
-          <button id="raciPageBtn" class="nav-button" type="button">RACI Matrix</button>
+          <button data-page="summary" class="nav-button active" type="button">Summary</button>
+          <button data-page="pipeline" class="nav-button" type="button">Pipeline</button>
+          <button data-page="detail" class="nav-button" type="button">Detail</button>
+          <button data-page="raci" class="nav-button" type="button">RACI</button>
+          <button data-page="admin" class="nav-button" type="button">Admin</button>
         </nav>
 
         <div id="productList" class="product-list" aria-label="Products"></div>
       </aside>
 
       <main class="workspace">
-        <div id="trackerPage" class="page active">
+        <section id="summaryPage" class="page active">
+          <div class="page-header">
+            <div>
+              <p class="eyebrow">Portfolio command center</p>
+              <h2>Summary</h2>
+              <p>Daily readout for commercialization health, launch readiness, blockers, and gate review flow.</p>
+            </div>
+          </div>
+          <div id="summaryMetrics" class="summary-strip"></div>
+          <div class="split-layout">
+            <section class="panel-block">
+              <div class="section-title">
+                <h3>Product Portfolio</h3>
+              </div>
+              <div class="table-wrap">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Current Gate</th>
+                      <th>Status</th>
+                      <th>Launch</th>
+                      <th>Open Blockers</th>
+                    </tr>
+                  </thead>
+                  <tbody id="summaryProductRows"></tbody>
+                </table>
+              </div>
+            </section>
+            <section class="panel-block">
+              <div class="section-title">
+                <h3>Gate Load</h3>
+              </div>
+              <div id="gateLoad" class="gate-load"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="pipelinePage" class="page">
           <section class="product-header">
             <div class="product-title">
               <label for="productName">Product</label>
               <input id="productName" type="text" />
             </div>
             <div class="header-grid">
-              <label>
-                Owner
-                <input id="productOwner" type="text" />
-              </label>
-              <label>
-                Target launch
-                <input id="targetLaunch" type="date" />
-              </label>
-              <label>
-                Current gate
-                <input id="currentGate" type="text" readonly />
-              </label>
-              <label>
-                Gate health
-                <input id="gateHealth" type="text" readonly />
-              </label>
+              <label>Owner<input id="productOwner" type="text" /></label>
+              <label>Target launch<input id="targetLaunch" type="date" /></label>
+              <label>Current gate<input id="currentGate" type="text" readonly /></label>
+              <label>Gate health<input id="gateHealth" type="text" readonly /></label>
             </div>
           </section>
 
           <section class="summary-strip" aria-label="Gate summary">
-            <div>
-              <span id="completeCount">0</span>
-              <small>Stages complete</small>
-            </div>
-            <div>
-              <span id="readyCount">0</span>
-              <small>Ready now</small>
-            </div>
-            <div>
-              <span id="blockedCount">0</span>
-              <small>Blocked</small>
-            </div>
-            <div>
-              <span id="forecastCm">0%</span>
-              <small>Base CM</small>
-            </div>
+            <div><span id="completeCount">0</span><small>Gates complete</small></div>
+            <div><span id="readyCount">0</span><small>Ready now</small></div>
+            <div><span id="blockedCount">0</span><small>Blocked</small></div>
+            <div><span id="forecastCm">0%</span><small>Base CM</small></div>
           </section>
 
           <section class="stage-layout">
             <div id="stageCards" class="stage-cards"></div>
           </section>
-        </div>
+        </section>
 
-        <div id="raciPage" class="page">
-          <section class="raci-header">
+        <section id="detailPage" class="page">
+          <section class="page-header">
+            <div>
+              <p class="eyebrow">Product workspace</p>
+              <h2 id="detailTitle">Product Detail</h2>
+              <p>Click a product in the left rail or summary table, then manage vendor, formula, packaging, testing, notes, and stage evidence here.</p>
+            </div>
+          </section>
+          <section class="detail-grid">
+            <label>Vendor / CM<input id="detailVendor" type="text" /></label>
+            <label>Formula round<input id="detailFormulaRound" type="text" /></label>
+            <label>Packaging status<select id="detailPackagingStatus"></select></label>
+            <label>Testing status<select id="detailTestingStatus"></select></label>
+            <label>Target launch<input id="detailLaunch" type="date" /></label>
+            <label>Hero claim<input id="detailHeroClaim" type="text" /></label>
+          </section>
+          <section class="panel-block">
+            <div class="section-title"><h3>All Stages</h3></div>
+            <div id="detailStages" class="detail-stage-list"></div>
+          </section>
+        </section>
+
+        <section id="raciPage" class="page">
+          <section class="page-header">
             <div>
               <p class="eyebrow">Operating model</p>
-              <h2>RACI Matrix by Stage</h2>
+              <h2>RACI Matrix by Gate</h2>
               <p>Customize roles, named people, and stage-level responsibility assignments as your company decides who owns each gate.</p>
             </div>
             <button id="addRaciRoleBtn" class="primary-button" type="button">+ Role</button>
           </section>
 
           <section class="raci-definitions" aria-label="RACI definitions">
-            <div><strong>A</strong><span>Accountable. Owns the go/no decision at the gate. One person only.</span></div>
+            <div><strong>A</strong><span>Accountable. Owns the go/no-go decision at the gate. One person only.</span></div>
             <div><strong>R</strong><span>Responsible. Does the work and delivers outputs for this stage.</span></div>
             <div><strong>C</strong><span>Consulted. Provides input with two-way communication before decisions.</span></div>
             <div><strong>I</strong><span>Informed. Kept up to date with one-way communication after decisions.</span></div>
@@ -102,13 +139,33 @@
 
           <section class="raci-table-wrap">
             <table class="raci-table">
-              <thead>
-                <tr id="raciHead"></tr>
-              </thead>
+              <thead><tr id="raciHead"></tr></thead>
               <tbody id="raciBody"></tbody>
             </table>
           </section>
-        </div>
+        </section>
+
+        <section id="adminPage" class="page">
+          <section class="page-header">
+            <div>
+              <p class="eyebrow">Admin and export</p>
+              <h2>Data Utilities</h2>
+              <p>Export CSVs for spreadsheet work, download a backup JSON file, or paste a JSON backup to restore local data.</p>
+            </div>
+          </section>
+          <section class="admin-grid">
+            <button id="exportProductsBtn" class="primary-button" type="button">Export Products CSV</button>
+            <button id="exportStagesBtn" class="primary-button" type="button">Export Stage Outputs CSV</button>
+            <button id="exportRaciBtn" class="primary-button" type="button">Export RACI CSV</button>
+            <button id="downloadJsonBtn" class="ghost-button" type="button">Download JSON Backup</button>
+          </section>
+          <section class="panel-block">
+            <div class="section-title"><h3>Restore JSON Backup</h3></div>
+            <textarea id="importJson" class="admin-textarea" placeholder="Paste JSON backup here"></textarea>
+            <button id="importJsonBtn" class="primary-button" type="button">Import Backup</button>
+            <p id="adminMessage" class="admin-message"></p>
+          </section>
+        </section>
       </main>
     </div>
 
@@ -122,7 +179,8 @@
           <span class="stage-status"></span>
         </div>
         <p class="stage-purpose"></p>
-        <div class="criteria-list"></div>
+        <div class="stage-admin-grid"></div>
+        <div class="output-grid"></div>
         <div class="input-grid"></div>
         <div class="stage-actions">
           <button class="back-button" type="button">Move Back</button>

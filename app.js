@@ -1,178 +1,139 @@
-const STORAGE_KEY = "skincare-stage-gate-manager-v1";
+const STORAGE_KEY = "skincare-commercialization-os-v2";
+
+const statusValues = [
+  "Not Started",
+  "In Progress",
+  "Waiting on Vendor",
+  "Waiting on Internal Decision",
+  "Blocked",
+  "Ready for Gate Review",
+  "Approved",
+];
+
 const raciValues = ["", "A", "R", "C", "I"];
 
-const stages = [
+const gates = [
   {
     title: "Find the Idea",
-    purpose: "Decide whether the idea is meaningfully different, fits the marine glycoprotein positioning, and is worth more investment.",
-    criteria: [
-      "Different from existing products on the market",
-      "Connects to marine glycoprotein positioning",
-      "Opportunity is worth further time investment",
-      "Initial risks and unknowns are named",
-    ],
+    purpose: "Decide whether the idea is differentiated, fits Marin's positioning, and deserves further investment.",
+    defaultOwner: "Product Lead",
+    decisions: ["Problem and target customer are clear", "Differentiation vs. market is compelling", "Marine glycoprotein story fits"],
+    documents: ["Idea brief", "Competitive scan", "Initial opportunity note"],
+    criteria: ["No obvious duplicate in market", "Fits brand and science platform", "Upside justifies deeper business case"],
     fields: [
-      { key: "ideaSummary", label: "Idea summary", type: "textarea", required: true, span: "wide" },
-      { key: "marketDifference", label: "Market difference", type: "textarea", required: true, span: "wide" },
-      { key: "positioningFit", label: "Marine glycoprotein fit", type: "textarea", required: true },
-      { key: "opportunityRationale", label: "Opportunity rationale", type: "textarea", required: true },
-      { key: "initialRisks", label: "Initial risks", type: "textarea", required: true },
+      { key: "ideaSummary", label: "Idea summary", type: "textarea", span: "wide" },
+      { key: "marketDifference", label: "Market difference", type: "textarea", span: "wide" },
+      { key: "positioningFit", label: "Marine glycoprotein positioning fit", type: "textarea" },
+      { key: "initialRisks", label: "Early risks", type: "textarea" },
     ],
   },
   {
     title: "Build the Business Case",
-    purpose: "Build a one-page financial model with conservative, base, and optimistic cases before committing heavier development resources.",
-    criteria: [
-      "Opportunity size is documented",
-      "Risks are documented",
-      "Conservative case is complete",
-      "Base case is complete",
-      "Optimistic case is complete",
-      "Base contribution margin meets threshold",
-    ],
+    purpose: "Pressure-test opportunity size, risks, and contribution margin across conservative, base, and optimistic cases.",
+    defaultOwner: "Commercial Lead",
+    decisions: ["Target price is approved", "Channel assumption is approved", "Business case is worth funding"],
+    documents: ["One-page financial model", "Risk register", "Pricing recommendation"],
+    criteria: ["Base contribution margin meets threshold", "Conservative case does not break the project", "Top risks have mitigation owners"],
     fields: [
-      { key: "opportunitySize", label: "Opportunity size", type: "textarea", required: true, span: "wide" },
-      { key: "businessRisks", label: "Business risks", type: "textarea", required: true, span: "wide" },
-      { key: "marginThreshold", label: "Required base CM %", type: "number", required: true, defaultValue: 55 },
-      { key: "pricingNotes", label: "Pricing and channel notes", type: "textarea", required: true, span: "wide" },
+      { key: "opportunitySize", label: "Opportunity size", type: "textarea", span: "wide" },
+      { key: "businessRisks", label: "Business risks", type: "textarea", span: "wide" },
+      { key: "marginThreshold", label: "Required base CM %", type: "number", defaultValue: 55 },
+      { key: "pricingNotes", label: "Pricing and channel notes", type: "textarea", span: "wide" },
       { key: "scenarioModel", label: "Scenario model", type: "scenario" },
     ],
   },
   {
-    title: "Formulation and Technical Development",
-    purpose: "Move from brief to technical feasibility with the contract manufacturer, formula direction, early consumer input, margin check, claims work, and safety testing.",
-    criteria: [
-      "Technical track active with contract manufacturer",
-      "Early consumer input received",
-      "Formula direction selected",
-      "Margin check passes against pricing",
-      "Claims substantiation has begun",
-      "Must-win performance specs are met",
-      "Safety and dermatology testing are complete",
-    ],
+    title: "Product Development",
+    purpose: "Develop the formula, technical path, consumer direction, claims plan, and safety evidence.",
+    defaultOwner: "R&D / Formulation",
+    decisions: ["Formula direction is selected", "Must-win performance specs are met", "Claims path is viable"],
+    documents: ["Product brief", "Formula round notes", "Safety and derm testing evidence"],
+    criteria: ["Contract manufacturer technical track is active", "Margin check passes against pricing", "Safety and dermatology testing are complete"],
     fields: [
-      { key: "manufacturer", label: "Contract manufacturer", type: "text", required: true },
-      { key: "formulaDirection", label: "Selected formula direction", type: "text", required: true },
-      { key: "consumerInput", label: "Early consumer input", type: "textarea", required: true, span: "wide" },
-      { key: "performanceSpecs", label: "Must-win specifications evidence", type: "textarea", required: true, span: "wide" },
-      { key: "claimsStart", label: "Claims substantiation status", type: "textarea", required: true },
-      { key: "safetyDerm", label: "Safety and derm testing evidence", type: "textarea", required: true },
+      { key: "manufacturer", label: "Contract manufacturer", type: "text" },
+      { key: "formulaDirection", label: "Selected formula direction", type: "text" },
+      { key: "consumerInput", label: "Early consumer input", type: "textarea", span: "wide" },
+      { key: "performanceSpecs", label: "Must-win specification evidence", type: "textarea", span: "wide" },
+      { key: "claimsStart", label: "Claims substantiation status", type: "textarea" },
+      { key: "safetyDerm", label: "Safety and derm testing evidence", type: "textarea" },
+    ],
+  },
+  {
+    title: "Packaging Development",
+    purpose: "Manage components, artwork, supplier timing, compatibility, and line-readiness without forcing the same timeline as formula work.",
+    defaultOwner: "Packaging / Operations",
+    decisions: ["Pack architecture is approved", "Supplier and component path are approved", "Artwork route is approved"],
+    documents: ["Packaging brief", "Supplier quote or MOQ summary", "Compatibility and line-trial evidence"],
+    criteria: ["Component supports formula and claims", "Unit cost and MOQ are acceptable", "Critical path dates support target launch"],
+    fields: [
+      { key: "packagingVendor", label: "Packaging vendor", type: "text" },
+      { key: "componentType", label: "Component / format", type: "text" },
+      { key: "artworkStatus", label: "Artwork status", type: "select", options: statusValues },
+      { key: "compatibilityNotes", label: "Compatibility notes", type: "textarea", span: "wide" },
+      { key: "lineTrialNotes", label: "Line trial notes", type: "textarea" },
+      { key: "packagingRisk", label: "Packaging risks", type: "textarea" },
     ],
   },
   {
     title: "Test and Validate",
-    purpose: "Validate the product and packaging experience before launch with in-home use testing, quick packaging comprehension, and claims documentation.",
-    criteria: [
-      "In-home use test completed",
-      "5-second packaging test completed",
-      "Claims final audit is documented",
-      "Launch recommendation is written",
-    ],
+    purpose: "Validate product and pack experience before launch with IHUT, fast packaging comprehension, and final claims documentation.",
+    defaultOwner: "Consumer Insights",
+    decisions: ["IHUT outcome supports launch", "Packaging comprehension is acceptable", "Claims documentation is final"],
+    documents: ["In-home use test readout", "5-second packaging test readout", "Claims final audit"],
+    criteria: ["No unresolved safety signal", "Launch recommendation is written", "Required rework is closed or accepted"],
     fields: [
-      { key: "ihutResult", label: "In-home use test result", type: "textarea", required: true, span: "wide" },
-      { key: "packagingFiveSecond", label: "5-second packaging test", type: "textarea", required: true },
-      { key: "claimsAudit", label: "Claims final audit", type: "textarea", required: true },
-      { key: "launchRecommendation", label: "Launch recommendation", type: "textarea", required: true, span: "wide" },
+      { key: "ihutResult", label: "In-home use test result", type: "textarea", span: "wide" },
+      { key: "packagingFiveSecond", label: "5-second packaging test", type: "textarea" },
+      { key: "claimsAudit", label: "Claims final audit", type: "textarea" },
+      { key: "launchRecommendation", label: "Launch recommendation", type: "textarea", span: "wide" },
     ],
   },
   {
     title: "Launch and Learn",
-    purpose: "Launch DTC first, learn from existing customers, focus on one hero claim, then review 90-day commercial and risk signals.",
-    criteria: [
-      "DTC-first launch is confirmed",
-      "Existing customers are prioritized first",
-      "One hero claim is selected",
-      "90-day forecast vs. buy-rate review is complete",
-      "90-day repurchase review is complete",
-      "Return rate is reviewed",
-      "Actual contribution margin is reviewed",
-      "Post-launch safety, regulatory, and claims issues are reviewed",
-    ],
+    purpose: "Launch DTC first, prioritize existing customers, focus on one hero claim, then review 90-day commercial and risk signals.",
+    defaultOwner: "Growth / Commercial",
+    decisions: ["DTC-first launch plan is approved", "One hero claim is locked", "90-day learning agenda is approved"],
+    documents: ["Launch plan", "90-day review", "Post-launch issue log"],
+    criteria: ["Forecast vs. buy-rate is reviewed", "Repurchase and return rates are reviewed", "Contribution margin and safety/regulatory/claims issues are reviewed"],
     fields: [
-      { key: "heroClaim", label: "Hero claim", type: "text", required: true },
-      { key: "dtcPlan", label: "DTC-first launch plan", type: "textarea", required: true },
-      { key: "customerPlan", label: "Existing-customer plan", type: "textarea", required: true },
-      { key: "forecastBuyRate", label: "90-day forecast vs buy rate", type: "textarea", required: true },
-      { key: "repurchaseRate", label: "90-day repurchase rate", type: "number", required: true, suffix: "%" },
-      { key: "returnRate", label: "Return rate", type: "number", required: true, suffix: "%" },
-      { key: "actualCm", label: "Actual contribution margin", type: "number", required: true, suffix: "%" },
-      { key: "postLaunchIssues", label: "Safety, regulatory, or claims issues", type: "textarea", required: true, span: "wide" },
+      { key: "heroClaim", label: "Hero claim", type: "text" },
+      { key: "dtcPlan", label: "DTC-first launch plan", type: "textarea" },
+      { key: "customerPlan", label: "Existing-customer plan", type: "textarea" },
+      { key: "forecastBuyRate", label: "90-day forecast vs buy rate", type: "textarea" },
+      { key: "repurchaseRate", label: "90-day repurchase rate (%)", type: "number" },
+      { key: "returnRate", label: "Return rate (%)", type: "number" },
+      { key: "actualCm", label: "Actual contribution margin (%)", type: "number" },
+      { key: "postLaunchIssues", label: "Safety, regulatory, or claims issues", type: "textarea", span: "wide" },
     ],
   },
 ];
 
-function createDemoProducts() {
-  return [
-    {
-      id: crypto.randomUUID(),
-      name: "Barrier Cloud Cream",
-      owner: "Product Marketing",
-      targetLaunch: "2026-10-15",
-      currentStage: 1,
-      fields: {
-        ideaSummary: "Ceramide-rich daily moisturizer centered on visible barrier recovery.",
-        marketDifference: "More elegant texture than occlusive barrier creams, with clinical marine glycoprotein story.",
-        positioningFit: "Marine glycoprotein is framed as the bioactive support system for stressed skin barrier.",
-        opportunityRationale: "High repeat-use category with room for a premium sensitive-skin positioning.",
-        initialRisks: "Pump compatibility, claims support, and margin pressure.",
-        opportunitySize: "US prestige barrier care opportunity is large enough to support DTC-first test.",
-        businessRisks: "Component cost and performance claims could compress margin.",
-        marginThreshold: 55,
-        pricingNotes: "Target $58 DTC price; retail expansion only after launch proof.",
-        manufacturer: "North Coast Labs",
-        formulaDirection: "F-03 ceramide gel-cream",
-      },
-      checks: {
-        0: [true, true, true, true],
-        1: [true, true, true, true, true, true],
-        2: [true, false, true, true, true, false, false],
-        3: [false, false, false, false],
-        4: [false, false, false, false, false, false, false, false],
-      },
-      scenarios: defaultScenarios(),
-    },
-    {
-      id: crypto.randomUUID(),
-      name: "Vitamin C Silk Serum",
-      owner: "R&D",
-      targetLaunch: "2026-12-01",
-      currentStage: 0,
-      fields: {
-        marginThreshold: 58,
-      },
-      checks: blankChecks(),
-      scenarios: defaultScenarios({
-        conservative: { units: 12000, price: 62, cogs: 14, marketing: 150000 },
-        base: { units: 26000, price: 62, cogs: 13.25, marketing: 240000 },
-        optimistic: { units: 44000, price: 62, cogs: 12.75, marketing: 360000 },
-      }),
-    },
-  ];
-}
-
 let state = loadState();
 let activeProductId = state.activeProductId || state.products[0].id;
-let activePage = state.activePage || "tracker";
+let activePage = state.activePage || "summary";
 
 const productList = document.querySelector("#productList");
-const stageCards = document.querySelector("#stageCards");
+const navButtons = document.querySelectorAll(".nav-button[data-page]");
+const pages = document.querySelectorAll(".page");
 const productName = document.querySelector("#productName");
 const productOwner = document.querySelector("#productOwner");
 const targetLaunch = document.querySelector("#targetLaunch");
 const currentGate = document.querySelector("#currentGate");
 const gateHealth = document.querySelector("#gateHealth");
-const trackerPage = document.querySelector("#trackerPage");
-const raciPage = document.querySelector("#raciPage");
-const trackerPageBtn = document.querySelector("#trackerPageBtn");
-const raciPageBtn = document.querySelector("#raciPageBtn");
+const stageCards = document.querySelector("#stageCards");
 const raciHead = document.querySelector("#raciHead");
 const raciBody = document.querySelector("#raciBody");
 
 document.querySelector("#addProductBtn").addEventListener("click", addProduct);
 document.querySelector("#resetDemoBtn").addEventListener("click", resetDemo);
 document.querySelector("#addRaciRoleBtn").addEventListener("click", addRaciRole);
-trackerPageBtn.addEventListener("click", () => setPage("tracker"));
-raciPageBtn.addEventListener("click", () => setPage("raci"));
+document.querySelector("#exportProductsBtn").addEventListener("click", exportProductsCsv);
+document.querySelector("#exportStagesBtn").addEventListener("click", exportStageCsv);
+document.querySelector("#exportRaciBtn").addEventListener("click", exportRaciCsv);
+document.querySelector("#downloadJsonBtn").addEventListener("click", downloadJson);
+document.querySelector("#importJsonBtn").addEventListener("click", importJson);
+
+navButtons.forEach((button) => button.addEventListener("click", () => setPage(button.dataset.page)));
 
 [productName, productOwner, targetLaunch].forEach((element) => {
   element.addEventListener("input", () => {
@@ -184,75 +145,168 @@ raciPageBtn.addEventListener("click", () => setPage("raci"));
   });
 });
 
+["detailVendor", "detailFormulaRound", "detailPackagingStatus", "detailTestingStatus", "detailLaunch", "detailHeroClaim"].forEach((id) => {
+  document.querySelector(`#${id}`).addEventListener("input", () => {
+    const product = getActiveProduct();
+    product.details.vendor = document.querySelector("#detailVendor").value;
+    product.details.formulaRound = document.querySelector("#detailFormulaRound").value;
+    product.details.packagingStatus = document.querySelector("#detailPackagingStatus").value;
+    product.details.testingStatus = document.querySelector("#detailTestingStatus").value;
+    product.targetLaunch = document.querySelector("#detailLaunch").value;
+    product.details.heroClaim = document.querySelector("#detailHeroClaim").value;
+    persistAndRender(false);
+  });
+});
+
 render();
+
+function createDemoProducts() {
+  return [
+    createProduct({
+      name: "Mint Lip Treatment",
+      owner: "Product Lead",
+      targetLaunch: "2026-11-15",
+      currentGate: 2,
+      details: {
+        vendor: "North Coast Labs",
+        formulaRound: "F-04",
+        packagingStatus: "Waiting on Vendor",
+        testingStatus: "In Progress",
+        heroClaim: "Instant cooling comfort with marine glycoprotein barrier support",
+      },
+      fields: {
+        ideaSummary: "A daily mint lip treatment for dry, reactive lips.",
+        marketDifference: "Cooling sensory profile plus barrier-care positioning instead of a plain balm.",
+        positioningFit: "Marine glycoprotein supports the hydration and comfort story.",
+        initialRisks: "Flavor allergen review, tube compatibility, and cooling level.",
+        opportunitySize: "Strong add-on product for existing DTC customers and replenishment bundles.",
+        businessRisks: "Low AOV if sold alone; component MOQ could pressure cash.",
+        marginThreshold: 58,
+        pricingNotes: "$24 DTC target with bundle strategy.",
+        manufacturer: "North Coast Labs",
+        formulaDirection: "F-04 mint peptide balm",
+      },
+      stageOverrides: {
+        0: { status: "Approved", owner: "Product Lead", decisions: [true, true, true], documents: [true, true, true], criteria: [true, true, true] },
+        1: { status: "Approved", owner: "Commercial Lead", decisions: [true, true, true], documents: [true, true, true], criteria: [true, true, true] },
+        2: { status: "In Progress", owner: "R&D / Formulation", decisions: [true, false, false], documents: [true, true, false], criteria: [true, true, false], blockers: "Awaiting final flavor allergen and derm review." },
+        3: { status: "Waiting on Vendor", owner: "Packaging / Operations", blockers: "Supplier confirming applicator MOQ and lead time." },
+      },
+    }),
+    createProduct({
+      name: "Mini Cream",
+      owner: "Commercial Lead",
+      targetLaunch: "2027-02-01",
+      currentGate: 1,
+      details: {
+        vendor: "TBD",
+        formulaRound: "Concept",
+        packagingStatus: "Not Started",
+        testingStatus: "Not Started",
+        heroClaim: "Barrier recovery in a travel-ready mini",
+      },
+      fields: {
+        ideaSummary: "Mini format of a barrier cream for trial, travel, and sets.",
+        marketDifference: "Accessible trial size linked to a premium science platform.",
+        positioningFit: "Clear marine glycoprotein story for stressed skin barrier.",
+        initialRisks: "Margin and component cost could be tight at mini size.",
+        marginThreshold: 52,
+      },
+      stageOverrides: {
+        0: { status: "Approved", owner: "Product Lead", decisions: [true, true, true], documents: [true, true, true], criteria: [true, true, true] },
+        1: { status: "Waiting on Internal Decision", owner: "Commercial Lead", blockers: "Needs price architecture and bundle strategy decision." },
+      },
+    }),
+  ];
+}
+
+function createProduct(options = {}) {
+  const product = {
+    id: crypto.randomUUID(),
+    name: options.name || "New Skincare Concept",
+    owner: options.owner || "",
+    targetLaunch: options.targetLaunch || "",
+    currentGate: options.currentGate || 0,
+    details: {
+      vendor: "",
+      formulaRound: "",
+      packagingStatus: "Not Started",
+      testingStatus: "Not Started",
+      heroClaim: "",
+      ...(options.details || {}),
+    },
+    fields: {
+      marginThreshold: 55,
+      ...(options.fields || {}),
+    },
+    scenarios: defaultScenarios(options.scenarioOverrides || {}),
+    gateData: gates.map((gate, index) => ({
+      status: index === 0 ? "In Progress" : "Not Started",
+      owner: gate.defaultOwner,
+      blockers: "",
+      notes: "",
+      decisions: gate.decisions.map(() => false),
+      documents: gate.documents.map(() => false),
+      criteria: gate.criteria.map(() => false),
+    })),
+  };
+
+  Object.entries(options.stageOverrides || {}).forEach(([index, override]) => {
+    product.gateData[Number(index)] = { ...product.gateData[Number(index)], ...override };
+  });
+
+  return product;
+}
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
   if (saved) {
     try {
-      const parsed = JSON.parse(saved);
-      if (Array.isArray(parsed.products) && parsed.products.length) {
-        parsed.raci = normalizeRaci(parsed.raci);
-        parsed.activePage ||= "tracker";
-        return parsed;
-      }
+      return normalizeState(JSON.parse(saved));
     } catch {}
   }
   const products = createDemoProducts();
-  return { products, activeProductId: products[0].id, activePage: "tracker", raci: defaultRaci() };
+  return normalizeState({ products, activeProductId: products[0].id, activePage: "summary", raci: defaultRaci() });
+}
+
+function normalizeState(raw) {
+  const products = Array.isArray(raw.products) && raw.products.length ? raw.products : createDemoProducts();
+  products.forEach(normalizeProduct);
+  return {
+    products,
+    activeProductId: raw.activeProductId || products[0].id,
+    activePage: raw.activePage || "summary",
+    raci: normalizeRaci(raw.raci),
+  };
+}
+
+function normalizeProduct(product) {
+  product.id ||= crypto.randomUUID();
+  product.details ||= {};
+  product.fields ||= {};
+  product.scenarios ||= defaultScenarios();
+  product.gateData ||= [];
+  gates.forEach((gate, index) => {
+    const data = product.gateData[index] || {};
+    product.gateData[index] = {
+      status: statusValues.includes(data.status) ? data.status : index === product.currentGate ? "In Progress" : "Not Started",
+      owner: data.owner || gate.defaultOwner,
+      blockers: data.blockers || "",
+      notes: data.notes || "",
+      decisions: gate.decisions.map((_, itemIndex) => Boolean(data.decisions?.[itemIndex])),
+      documents: gate.documents.map((_, itemIndex) => Boolean(data.documents?.[itemIndex])),
+      criteria: gate.criteria.map((_, itemIndex) => Boolean(data.criteria?.[itemIndex])),
+    };
+  });
+  product.currentGate = Math.min(Number(product.currentGate) || 0, gates.length - 1);
+  product.details.packagingStatus ||= "Not Started";
+  product.details.testingStatus ||= "Not Started";
 }
 
 function saveState() {
   state.activeProductId = activeProductId;
   state.activePage = activePage;
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-}
-
-function blankChecks() {
-  return Object.fromEntries(stages.map((stage, index) => [index, stage.criteria.map(() => false)]));
-}
-
-function defaultRaci() {
-  return {
-    roles: [
-      { role: "Founder / CEO", person: "", assignments: ["A", "A", "I", "I", "A"] },
-      { role: "Product Lead", person: "", assignments: ["R", "R", "A", "A", "R"] },
-      { role: "R&D / Formulation", person: "", assignments: ["C", "C", "R", "C", "C"] },
-      { role: "Contract Manufacturer", person: "", assignments: ["", "C", "R", "C", "I"] },
-      { role: "Regulatory / Claims", person: "", assignments: ["C", "C", "C", "R", "C"] },
-      { role: "Marketing / Brand", person: "", assignments: ["C", "R", "C", "R", "R"] },
-      { role: "Operations / Supply", person: "", assignments: ["I", "C", "R", "C", "R"] },
-    ],
-  };
-}
-
-function normalizeRaci(raci) {
-  const normalized = raci && Array.isArray(raci.roles) && raci.roles.length ? raci : defaultRaci();
-  normalized.roles.forEach((role) => {
-    role.assignments ||= [];
-    role.assignments = stages.map((_, index) => role.assignments[index] || "");
-    role.role ||= "";
-    role.person ||= "";
-  });
-  return normalized;
-}
-
-function defaultScenarios(overrides = {}) {
-  return {
-    conservative: { units: 15000, price: 58, cogs: 16, marketing: 160000, ...overrides.conservative },
-    base: { units: 30000, price: 58, cogs: 14.5, marketing: 260000, ...overrides.base },
-    optimistic: { units: 52000, price: 58, cogs: 13.5, marketing: 390000, ...overrides.optimistic },
-  };
-}
-
-function getActiveProduct() {
-  return state.products.find((product) => product.id === activeProductId) || state.products[0];
-}
-
-function persistAndRender(full = true) {
-  saveState();
-  if (full) render();
-  else renderSummary();
 }
 
 function render() {
@@ -262,17 +316,15 @@ function render() {
   targetLaunch.value = product.targetLaunch || "";
   renderPage();
   renderProducts();
-  renderStages(product);
-  renderRaci();
   renderSummary();
+  renderPipeline(product);
+  renderDetail(product);
+  renderRaci();
 }
 
 function renderPage() {
-  trackerPage.classList.toggle("active", activePage === "tracker");
-  raciPage.classList.toggle("active", activePage === "raci");
-  trackerPageBtn.classList.toggle("active", activePage === "tracker");
-  raciPageBtn.classList.toggle("active", activePage === "raci");
-  productList.hidden = activePage === "raci";
+  pages.forEach((page) => page.classList.toggle("active", page.id === `${activePage}Page`));
+  navButtons.forEach((button) => button.classList.toggle("active", button.dataset.page === activePage));
 }
 
 function renderProducts() {
@@ -281,56 +333,217 @@ function renderProducts() {
     const button = document.createElement("button");
     button.className = `product-tab${product.id === activeProductId ? " active" : ""}`;
     button.type = "button";
-    button.innerHTML = `<strong>${escapeHtml(product.name || "Untitled product")}</strong><span>${stages[product.currentStage]?.title || "Complete"}</span>`;
+    button.innerHTML = `<strong>${escapeHtml(product.name || "Untitled product")}</strong><span>${gates[product.currentGate]?.title || "Complete"} · ${currentGateStatus(product)}</span>`;
     button.addEventListener("click", () => {
       activeProductId = product.id;
+      activePage = "detail";
       persistAndRender();
     });
     productList.append(button);
   });
 }
 
-function renderStages(product) {
+function renderSummary() {
+  const activeProducts = state.products.length;
+  const ready = state.products.filter((product) => currentGateStatus(product) === "Ready for Gate Review").length;
+  const blocked = state.products.filter((product) => hasBlocker(product)).length;
+  const approvedGates = state.products.flatMap((product) => product.gateData).filter((gate) => gate.status === "Approved").length;
+  const totalGates = state.products.length * gates.length;
+
+  document.querySelector("#summaryMetrics").innerHTML = `
+    <div><span>${activeProducts}</span><small>Active products</small></div>
+    <div><span>${ready}</span><small>Ready for review</small></div>
+    <div><span>${blocked}</span><small>Products blocked</small></div>
+    <div><span>${Math.round((approvedGates / totalGates) * 100) || 0}%</span><small>Gate completion</small></div>
+  `;
+
+  const tbody = document.querySelector("#summaryProductRows");
+  tbody.innerHTML = "";
+  state.products.forEach((product) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><button class="link-button" type="button">${escapeHtml(product.name)}</button></td>
+      <td>${escapeHtml(gates[product.currentGate].title)}</td>
+      <td><span class="status-pill ${statusClass(currentGateStatus(product))}">${escapeHtml(currentGateStatus(product))}</span></td>
+      <td>${escapeHtml(product.targetLaunch || "TBD")}</td>
+      <td>${countBlockers(product)}</td>
+    `;
+    tr.querySelector("button").addEventListener("click", () => {
+      activeProductId = product.id;
+      activePage = "detail";
+      persistAndRender();
+    });
+    tbody.append(tr);
+  });
+
+  const gateLoad = document.querySelector("#gateLoad");
+  gateLoad.innerHTML = "";
+  gates.forEach((gate, index) => {
+    const inGate = state.products.filter((product) => product.currentGate === index).length;
+    const div = document.createElement("div");
+    div.innerHTML = `<strong>${escapeHtml(gate.title)}</strong><span>${inGate} product${inGate === 1 ? "" : "s"}</span>`;
+    gateLoad.append(div);
+  });
+}
+
+function renderPipeline(product) {
+  currentGate.value = gates[product.currentGate].title;
+  gateHealth.value = getGateHealth(product, product.currentGate);
+  document.querySelector("#completeCount").textContent = `${product.gateData.filter((gate) => gate.status === "Approved").length} / ${gates.length}`;
+  document.querySelector("#readyCount").textContent = product.gateData.filter((gate) => gate.status === "Ready for Gate Review").length;
+  document.querySelector("#blockedCount").textContent = countBlockers(product);
+  document.querySelector("#forecastCm").textContent = `${Math.round(computeScenario(product.scenarios.base).cmPercent)}%`;
+
   stageCards.innerHTML = "";
-  stages.forEach((stage, stageIndex) => {
+  gates.forEach((gate, gateIndex) => {
+    const data = product.gateData[gateIndex];
     const card = document.querySelector("#stageTemplate").content.firstElementChild.cloneNode(true);
-    const complete = isStageComplete(product, stageIndex);
-    const current = product.currentStage === stageIndex;
-    const locked = stageIndex > product.currentStage;
-    const ready = current && complete;
-    const status = locked ? "Locked" : complete ? "Ready" : current ? "In Progress" : "Complete";
-
+    const ready = isGateReady(product, gateIndex);
+    const current = product.currentGate === gateIndex;
     card.classList.toggle("current", current);
-    card.classList.toggle("complete", complete && !current);
-    card.classList.toggle("blocked", current && !complete);
-    card.querySelector(".stage-number").textContent = `Stage ${stageIndex + 1}`;
-    card.querySelector("h2").textContent = stage.title;
-    card.querySelector(".stage-purpose").textContent = stage.purpose;
+    card.classList.toggle("complete", data.status === "Approved");
+    card.classList.toggle("has-blocker", data.status === "Blocked" || Boolean(data.blockers.trim()));
+    card.querySelector(".stage-number").textContent = `Gate ${gateIndex + 1}`;
+    card.querySelector("h2").textContent = gate.title;
+    card.querySelector(".stage-purpose").textContent = gate.purpose;
     const statusEl = card.querySelector(".stage-status");
-    statusEl.textContent = status;
-    statusEl.classList.toggle("ready", ready || (complete && !current));
-    statusEl.classList.toggle("blocked", current && !complete);
-
-    renderCriteria(card.querySelector(".criteria-list"), product, stageIndex, locked);
-    renderInputs(card.querySelector(".input-grid"), product, stageIndex, locked);
-
-    const backButton = card.querySelector(".back-button");
-    const advanceButton = card.querySelector(".advance-button");
-    backButton.disabled = stageIndex !== product.currentStage || product.currentStage === 0;
-    advanceButton.disabled = stageIndex !== product.currentStage || !complete;
-    advanceButton.textContent = stageIndex === stages.length - 1 ? "Complete Launch Review" : "Advance";
-
-    backButton.addEventListener("click", () => {
-      product.currentStage = Math.max(0, product.currentStage - 1);
-      persistAndRender();
-    });
-    advanceButton.addEventListener("click", () => {
-      product.currentStage = Math.min(stages.length - 1, product.currentStage + 1);
-      persistAndRender();
-      document.querySelector(".stage-card.current")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
+    statusEl.textContent = data.status;
+    statusEl.className = `stage-status ${statusClass(data.status)}`;
+    renderStageAdmin(card.querySelector(".stage-admin-grid"), product, gateIndex);
+    renderOutputChecklist(card.querySelector(".output-grid"), product, gateIndex);
+    renderInputs(card.querySelector(".input-grid"), product, gateIndex);
+    renderStageActions(card, product, gateIndex, ready);
     stageCards.append(card);
+  });
+}
+
+function renderStageAdmin(container, product, gateIndex) {
+  const data = product.gateData[gateIndex];
+  container.innerHTML = "";
+  container.append(
+    fieldShell("Status", renderSelect(data.status, statusValues, (value) => {
+      data.status = value;
+      persistAndRender();
+    })),
+    fieldShell("Owner", renderInput(data.owner, (value) => {
+      data.owner = value;
+      persistAndRender(false);
+    })),
+    fieldShell("Blockers", renderTextarea(data.blockers, (value) => {
+      data.blockers = value;
+      persistAndRender(false);
+    })),
+    fieldShell("Notes", renderTextarea(data.notes, (value) => {
+      data.notes = value;
+      persistAndRender(false);
+    })),
+  );
+}
+
+function renderOutputChecklist(container, product, gateIndex) {
+  container.innerHTML = "";
+  const gate = gates[gateIndex];
+  const data = product.gateData[gateIndex];
+  [
+    ["Required decisions", "decisions", gate.decisions],
+    ["Required documents", "documents", gate.documents],
+    ["Go/no-go criteria", "criteria", gate.criteria],
+  ].forEach(([title, key, items]) => {
+    const section = document.createElement("section");
+    section.className = "output-section";
+    section.innerHTML = `<h3>${title}</h3>`;
+    items.forEach((item, itemIndex) => {
+      const label = document.createElement("label");
+      label.className = "criterion";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = Boolean(data[key][itemIndex]);
+      checkbox.addEventListener("change", () => {
+        data[key][itemIndex] = checkbox.checked;
+        if (isGateReady(product, gateIndex) && data.status !== "Approved") data.status = "Ready for Gate Review";
+        persistAndRender();
+      });
+      label.append(checkbox, document.createTextNode(item));
+      section.append(label);
+    });
+    container.append(section);
+  });
+}
+
+function renderInputs(container, product, gateIndex) {
+  container.innerHTML = "";
+  gates[gateIndex].fields.forEach((field) => {
+    if (field.type === "scenario") {
+      container.append(renderScenarioModel(product));
+      return;
+    }
+    const value = product.fields[field.key] ?? field.defaultValue ?? "";
+    const control = field.type === "textarea"
+      ? renderTextarea(value, (newValue) => {
+          product.fields[field.key] = newValue;
+          persistAndRender(false);
+        })
+      : field.type === "select"
+        ? renderSelect(value, field.options || statusValues, (newValue) => {
+            product.fields[field.key] = newValue;
+            persistAndRender(false);
+          })
+        : renderInput(value, (newValue) => {
+            product.fields[field.key] = field.type === "number" ? Number(newValue) : newValue;
+            persistAndRender(false);
+          }, field.type);
+    const shell = fieldShell(field.label, control);
+    if (field.span) shell.classList.add(field.span);
+    container.append(shell);
+  });
+}
+
+function renderStageActions(card, product, gateIndex, ready) {
+  const backButton = card.querySelector(".back-button");
+  const advanceButton = card.querySelector(".advance-button");
+  backButton.disabled = gateIndex !== product.currentGate || product.currentGate === 0;
+  advanceButton.disabled = gateIndex !== product.currentGate || !ready;
+  advanceButton.textContent = gateIndex === gates.length - 1 ? "Complete Review" : "Advance";
+  backButton.addEventListener("click", () => {
+    product.currentGate = Math.max(0, product.currentGate - 1);
+    persistAndRender();
+  });
+  advanceButton.addEventListener("click", () => {
+    product.gateData[gateIndex].status = "Approved";
+    product.currentGate = Math.min(gates.length - 1, product.currentGate + 1);
+    if (product.gateData[product.currentGate].status === "Not Started") product.gateData[product.currentGate].status = "In Progress";
+    persistAndRender();
+  });
+}
+
+function renderDetail(product) {
+  document.querySelector("#detailTitle").textContent = product.name || "Product Detail";
+  setSelectOptions(document.querySelector("#detailPackagingStatus"), statusValues, product.details.packagingStatus);
+  setSelectOptions(document.querySelector("#detailTestingStatus"), statusValues, product.details.testingStatus);
+  document.querySelector("#detailVendor").value = product.details.vendor || "";
+  document.querySelector("#detailFormulaRound").value = product.details.formulaRound || "";
+  document.querySelector("#detailLaunch").value = product.targetLaunch || "";
+  document.querySelector("#detailHeroClaim").value = product.details.heroClaim || "";
+
+  const detailStages = document.querySelector("#detailStages");
+  detailStages.innerHTML = "";
+  gates.forEach((gate, index) => {
+    const data = product.gateData[index];
+    const div = document.createElement("article");
+    div.className = "detail-stage-card";
+    div.innerHTML = `
+      <div>
+        <p>Gate ${index + 1}</p>
+        <h3>${escapeHtml(gate.title)}</h3>
+      </div>
+      <span class="status-pill ${statusClass(data.status)}">${escapeHtml(data.status)}</span>
+      <dl>
+        <dt>Owner</dt><dd>${escapeHtml(data.owner || "Unassigned")}</dd>
+        <dt>Blockers</dt><dd>${escapeHtml(data.blockers || "None")}</dd>
+        <dt>Notes</dt><dd>${escapeHtml(data.notes || "None")}</dd>
+      </dl>
+    `;
+    detailStages.append(div);
   });
 }
 
@@ -344,40 +557,26 @@ function renderRaci() {
     th.textContent = label;
     raciHead.append(th);
   });
-  stages.forEach((stage) => {
+  gates.forEach((gate) => {
     const th = document.createElement("th");
     th.className = "stage-col";
-    th.textContent = stage.title;
+    th.textContent = gate.title;
     raciHead.append(th);
   });
-  const actionTh = document.createElement("th");
-  actionTh.textContent = "";
-  raciHead.append(actionTh);
+  raciHead.append(document.createElement("th"));
 
   state.raci.roles.forEach((role, roleIndex) => {
     const tr = document.createElement("tr");
     tr.append(renderRaciTextInput(role, roleIndex, "role", "Role"));
     tr.append(renderRaciTextInput(role, roleIndex, "person", "Person"));
-
-    stages.forEach((_, stageIndex) => {
+    gates.forEach((_, gateIndex) => {
       const td = document.createElement("td");
       td.className = "assignment-cell";
-      const select = document.createElement("select");
-      select.value = role.assignments?.[stageIndex] || "";
-      setRaciSelectClass(select);
-      raciValues.forEach((value) => {
-        const option = document.createElement("option");
-        option.value = value;
-        option.textContent = value || "-";
-        select.append(option);
-      });
-      select.addEventListener("change", () => {
-        setRaciAssignment(roleIndex, stageIndex, select.value);
-      });
+      const select = renderSelect(role.assignments[gateIndex] || "", raciValues, (value) => setRaciAssignment(roleIndex, gateIndex, value));
+      select.className = statusClass(select.value);
       td.append(select);
       tr.append(td);
     });
-
     const actionTd = document.createElement("td");
     const removeButton = document.createElement("button");
     removeButton.className = "remove-role-button";
@@ -396,25 +595,23 @@ function renderRaci() {
   renderRaciAccountableWarnings();
 }
 
-function renderRaciTextInput(role, roleIndex, key, label) {
+function renderRaciTextInput(role, roleIndex, key, placeholder) {
   const td = document.createElement("td");
-  const input = document.createElement("input");
-  input.value = role[key] || "";
-  input.placeholder = label;
-  input.addEventListener("input", () => {
-    state.raci.roles[roleIndex][key] = input.value;
+  const input = renderInput(role[key] || "", (value) => {
+    state.raci.roles[roleIndex][key] = value;
     persistAndRender(false);
   });
+  input.placeholder = placeholder;
   td.append(input);
   return td;
 }
 
 function renderRaciAccountableWarnings() {
-  stages.forEach((_, stageIndex) => {
-    const accountable = state.raci.roles.filter((role) => role.assignments?.[stageIndex] === "A");
-    const cell = raciBody.rows[0]?.cells[stageIndex + 2];
-    if (!cell) return;
+  gates.forEach((_, gateIndex) => {
+    const accountable = state.raci.roles.filter((role) => role.assignments?.[gateIndex] === "A");
     if (accountable.length === 1 && accountable[0].person.trim()) return;
+    const cell = raciBody.rows[0]?.cells[gateIndex + 2];
+    if (!cell) return;
     const warning = document.createElement("div");
     warning.className = "raci-warning";
     warning.textContent = accountable.length === 0 ? "Needs one A" : "Name the A";
@@ -422,76 +619,7 @@ function renderRaciAccountableWarnings() {
   });
 }
 
-function setRaciAssignment(roleIndex, stageIndex, value) {
-  state.raci.roles.forEach((role, index) => {
-    role.assignments ||= Array(stages.length).fill("");
-    if (value === "A" && index !== roleIndex && role.assignments[stageIndex] === "A") {
-      role.assignments[stageIndex] = "";
-    }
-  });
-  state.raci.roles[roleIndex].assignments[stageIndex] = value;
-  persistAndRender();
-}
-
-function setRaciSelectClass(select) {
-  select.className = "";
-  const classByValue = {
-    A: "accountable",
-    R: "responsible",
-    C: "consulted",
-    I: "informed",
-  };
-  if (classByValue[select.value]) select.classList.add(classByValue[select.value]);
-}
-
-function renderCriteria(container, product, stageIndex, locked) {
-  container.innerHTML = "";
-  const checks = ensureChecks(product, stageIndex);
-  stages[stageIndex].criteria.forEach((criterion, criterionIndex) => {
-    const label = document.createElement("label");
-    label.className = "criterion";
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = Boolean(checks[criterionIndex]);
-    checkbox.disabled = locked;
-    checkbox.addEventListener("change", () => {
-      checks[criterionIndex] = checkbox.checked;
-      persistAndRender();
-    });
-    label.append(checkbox, document.createTextNode(criterion));
-    container.append(label);
-  });
-}
-
-function renderInputs(container, product, stageIndex, locked) {
-  container.innerHTML = "";
-  const fields = product.fields || (product.fields = {});
-  stages[stageIndex].fields.forEach((field) => {
-    if (field.type === "scenario") {
-      container.append(renderScenarioModel(product, locked));
-      return;
-    }
-
-    const wrapper = document.createElement("div");
-    wrapper.className = `input-field ${field.span || ""}`;
-    const label = document.createElement("label");
-    label.textContent = field.suffix ? `${field.label} (${field.suffix})` : field.label;
-    const input = field.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
-    if (field.type !== "textarea") input.type = field.type;
-    input.value = fields[field.key] ?? field.defaultValue ?? "";
-    input.disabled = locked;
-    input.addEventListener("input", () => {
-      fields[field.key] = field.type === "number" ? Number(input.value) : input.value;
-      persistAndRender();
-    });
-    label.append(input);
-    wrapper.append(label);
-    container.append(wrapper);
-  });
-}
-
-function renderScenarioModel(product, locked) {
-  product.scenarios ||= defaultScenarios();
+function renderScenarioModel(product) {
   const wrapper = document.createElement("div");
   wrapper.className = "scenario-table";
   const rows = [
@@ -505,36 +633,21 @@ function renderScenarioModel(product, locked) {
     ["CM %", "cmPercent"],
   ];
   const cases = ["conservative", "base", "optimistic"];
-  wrapper.innerHTML = `
-    <table>
-      <thead>
-        <tr><th>One-page financial model</th><th>Conservative</th><th>Base</th><th>Optimistic</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  `;
+  wrapper.innerHTML = "<table><thead><tr><th>One-page financial model</th><th>Conservative</th><th>Base</th><th>Optimistic</th></tr></thead><tbody></tbody></table>";
   const tbody = wrapper.querySelector("tbody");
   rows.forEach(([label, key]) => {
     const tr = document.createElement("tr");
-    const th = document.createElement("td");
-    th.textContent = label;
-    tr.append(th);
+    tr.innerHTML = `<td>${label}</td>`;
     cases.forEach((caseName) => {
       const td = document.createElement("td");
       const computed = computeScenario(product.scenarios[caseName]);
       if (["revenue", "grossProfit", "contributionMargin", "cmPercent"].includes(key)) {
-        const output = document.createElement("output");
-        output.textContent = key === "cmPercent" ? `${Math.round(computed[key])}%` : money(computed[key]);
-        td.append(output);
+        td.innerHTML = `<output>${key === "cmPercent" ? `${Math.round(computed[key])}%` : money(computed[key])}</output>`;
       } else {
-        const input = document.createElement("input");
-        input.type = "number";
-        input.value = product.scenarios[caseName][key] ?? "";
-        input.disabled = locked;
-        input.addEventListener("input", () => {
-          product.scenarios[caseName][key] = Number(input.value);
+        const input = renderInput(product.scenarios[caseName][key], (value) => {
+          product.scenarios[caseName][key] = Number(value);
           persistAndRender();
-        });
+        }, "number");
         td.append(input);
       }
       tr.append(td);
@@ -542,6 +655,81 @@ function renderScenarioModel(product, locked) {
     tbody.append(tr);
   });
   return wrapper;
+}
+
+function fieldShell(label, control) {
+  const wrapper = document.createElement("label");
+  wrapper.className = "input-field";
+  wrapper.append(document.createTextNode(label), control);
+  return wrapper;
+}
+
+function renderInput(value, onInput, type = "text") {
+  const input = document.createElement("input");
+  input.type = type;
+  input.value = value ?? "";
+  input.addEventListener("input", () => onInput(input.value));
+  return input;
+}
+
+function renderTextarea(value, onInput) {
+  const textarea = document.createElement("textarea");
+  textarea.value = value ?? "";
+  textarea.addEventListener("input", () => onInput(textarea.value));
+  return textarea;
+}
+
+function renderSelect(value, values, onChange) {
+  const select = document.createElement("select");
+  setSelectOptions(select, values, value);
+  select.addEventListener("change", () => onChange(select.value));
+  return select;
+}
+
+function setSelectOptions(select, values, selectedValue) {
+  select.innerHTML = "";
+  values.forEach((value) => {
+    const option = document.createElement("option");
+    option.value = value;
+    option.textContent = value || "-";
+    select.append(option);
+  });
+  select.value = selectedValue || values[0] || "";
+}
+
+function isGateReady(product, gateIndex) {
+  const data = product.gateData[gateIndex];
+  const outputsReady = ["decisions", "documents", "criteria"].every((key) => data[key].every(Boolean));
+  const businessReady = gates[gateIndex].fields.some((field) => field.type === "scenario") ? scenariosComplete(product) : true;
+  return outputsReady && businessReady && data.status !== "Blocked";
+}
+
+function getGateHealth(product, gateIndex) {
+  const data = product.gateData[gateIndex];
+  if (data.status === "Blocked" || data.blockers.trim()) return "Blocked or at risk";
+  if (isGateReady(product, gateIndex)) return "Ready for gate review";
+  return "Outputs still open";
+}
+
+function currentGateStatus(product) {
+  return product.gateData[product.currentGate]?.status || "Not Started";
+}
+
+function hasBlocker(product) {
+  return product.gateData.some((gate) => gate.status === "Blocked" || gate.blockers.trim());
+}
+
+function countBlockers(product) {
+  return product.gateData.filter((gate) => gate.status === "Blocked" || gate.blockers.trim()).length;
+}
+
+function scenariosComplete(product) {
+  const scenarioPass = ["conservative", "base", "optimistic"].every((caseName) => {
+    const scenario = product.scenarios?.[caseName] || {};
+    return ["units", "price", "cogs", "marketing"].every((key) => Number(scenario[key]) > 0);
+  });
+  const threshold = Number(product.fields?.marginThreshold) || 0;
+  return scenarioPass && computeScenario(product.scenarios?.base).cmPercent >= threshold;
 }
 
 function computeScenario(scenario = {}) {
@@ -556,74 +744,66 @@ function computeScenario(scenario = {}) {
   return { revenue, grossProfit, contributionMargin, cmPercent };
 }
 
-function isStageComplete(product, stageIndex) {
-  const checks = ensureChecks(product, stageIndex);
-  const criteriaPass = checks.every(Boolean);
-  const fieldsPass = stages[stageIndex].fields.every((field) => {
-    if (field.type === "scenario") return scenariosComplete(product);
-    if (!field.required) return true;
-    const value = product.fields?.[field.key] ?? field.defaultValue;
-    return value !== undefined && value !== null && String(value).trim() !== "";
-  });
-  return criteriaPass && fieldsPass;
-}
-
-function scenariosComplete(product) {
-  const scenarioPass = ["conservative", "base", "optimistic"].every((caseName) => {
-    const scenario = product.scenarios?.[caseName] || {};
-    return ["units", "price", "cogs", "marketing"].every((key) => Number(scenario[key]) > 0);
-  });
-  const threshold = Number(product.fields?.marginThreshold) || 0;
-  return scenarioPass && computeScenario(product.scenarios?.base).cmPercent >= threshold;
-}
-
-function ensureChecks(product, stageIndex) {
-  product.checks ||= blankChecks();
-  product.checks[stageIndex] ||= stages[stageIndex].criteria.map(() => false);
-  return product.checks[stageIndex];
-}
-
-function renderSummary() {
-  const product = getActiveProduct();
-  const complete = stages.filter((_, index) => isStageComplete(product, index)).length;
-  const ready = stages.filter((_, index) => product.currentStage === index && isStageComplete(product, index)).length;
-  const blocked = stages.filter((_, index) => product.currentStage === index && !isStageComplete(product, index)).length;
-  const baseCm = computeScenario(product.scenarios?.base).cmPercent;
-
-  currentGate.value = stages[product.currentStage]?.title || "Complete";
-  gateHealth.value = ready ? "Ready to advance" : "Gate items open";
-  document.querySelector("#completeCount").textContent = `${complete} / ${stages.length}`;
-  document.querySelector("#readyCount").textContent = ready;
-  document.querySelector("#blockedCount").textContent = blocked;
-  document.querySelector("#forecastCm").textContent = `${Math.round(baseCm)}%`;
-  renderProducts();
-}
-
-function addProduct() {
-  const product = {
-    id: crypto.randomUUID(),
-    name: "New Skincare Concept",
-    owner: "",
-    targetLaunch: "",
-    currentStage: 0,
-    fields: { marginThreshold: 55 },
-    checks: blankChecks(),
-    scenarios: defaultScenarios(),
+function defaultScenarios(overrides = {}) {
+  return {
+    conservative: { units: 15000, price: 58, cogs: 16, marketing: 160000, ...overrides.conservative },
+    base: { units: 30000, price: 58, cogs: 14.5, marketing: 260000, ...overrides.base },
+    optimistic: { units: 52000, price: 58, cogs: 13.5, marketing: 390000, ...overrides.optimistic },
   };
-  state.products.unshift(product);
-  activeProductId = product.id;
+}
+
+function defaultRaci() {
+  return {
+    roles: [
+      { role: "Founder / CEO", person: "", assignments: ["A", "A", "I", "I", "I", "A"] },
+      { role: "Product Lead", person: "", assignments: ["R", "R", "A", "C", "A", "R"] },
+      { role: "R&D / Formulation", person: "", assignments: ["C", "C", "R", "C", "C", "C"] },
+      { role: "Packaging / Operations", person: "", assignments: ["I", "C", "C", "A", "C", "R"] },
+      { role: "Regulatory / Claims", person: "", assignments: ["C", "C", "C", "C", "R", "C"] },
+      { role: "Growth / Marketing", person: "", assignments: ["C", "R", "C", "C", "R", "R"] },
+    ],
+  };
+}
+
+function normalizeRaci(raci) {
+  const normalized = raci && Array.isArray(raci.roles) && raci.roles.length ? raci : defaultRaci();
+  normalized.roles.forEach((role) => {
+    role.assignments ||= [];
+    role.assignments = gates.map((_, index) => role.assignments[index] || "");
+    role.role ||= "";
+    role.person ||= "";
+  });
+  return normalized;
+}
+
+function setRaciAssignment(roleIndex, gateIndex, value) {
+  state.raci.roles.forEach((role, index) => {
+    if (value === "A" && index !== roleIndex && role.assignments[gateIndex] === "A") role.assignments[gateIndex] = "";
+  });
+  state.raci.roles[roleIndex].assignments[gateIndex] = value;
   persistAndRender();
 }
 
 function addRaciRole() {
-  state.raci ||= defaultRaci();
-  state.raci.roles.push({
-    role: "New role",
-    person: "",
-    assignments: Array(stages.length).fill(""),
-  });
+  state.raci.roles.push({ role: "New role", person: "", assignments: gates.map(() => "") });
   activePage = "raci";
   persistAndRender();
+}
+
+function addProduct() {
+  const product = createProduct();
+  state.products.unshift(product);
+  activeProductId = product.id;
+  activePage = "detail";
+  persistAndRender();
+}
+
+function resetDemo() {
+  const products = createDemoProducts();
+  state = normalizeState({ products, activeProductId: products[0].id, activePage, raci: defaultRaci() });
+  activeProductId = state.activeProductId;
+  saveState();
+  render();
 }
 
 function setPage(page) {
@@ -631,12 +811,96 @@ function setPage(page) {
   persistAndRender();
 }
 
-function resetDemo() {
-  const products = createDemoProducts();
-  state = { products, activeProductId: products[0].id, activePage, raci: defaultRaci() };
-  activeProductId = state.activeProductId;
+function getActiveProduct() {
+  return state.products.find((product) => product.id === activeProductId) || state.products[0];
+}
+
+function persistAndRender(full = true) {
   saveState();
-  render();
+  if (full) render();
+  else {
+    renderProducts();
+    renderSummary();
+  }
+}
+
+function exportProductsCsv() {
+  const rows = [["Product", "Owner", "Target Launch", "Current Gate", "Current Status", "Vendor", "Formula Round", "Packaging Status", "Testing Status"]];
+  state.products.forEach((product) => rows.push([
+    product.name,
+    product.owner,
+    product.targetLaunch,
+    gates[product.currentGate].title,
+    currentGateStatus(product),
+    product.details.vendor,
+    product.details.formulaRound,
+    product.details.packagingStatus,
+    product.details.testingStatus,
+  ]));
+  downloadText("products.csv", toCsv(rows), "text/csv");
+}
+
+function exportStageCsv() {
+  const rows = [["Product", "Gate", "Status", "Owner", "Blockers", "Notes", "Decisions Complete", "Documents Complete", "Criteria Complete"]];
+  state.products.forEach((product) => {
+    product.gateData.forEach((data, index) => rows.push([
+      product.name,
+      gates[index].title,
+      data.status,
+      data.owner,
+      data.blockers,
+      data.notes,
+      `${data.decisions.filter(Boolean).length}/${data.decisions.length}`,
+      `${data.documents.filter(Boolean).length}/${data.documents.length}`,
+      `${data.criteria.filter(Boolean).length}/${data.criteria.length}`,
+    ]));
+  });
+  downloadText("stage-outputs.csv", toCsv(rows), "text/csv");
+}
+
+function exportRaciCsv() {
+  const rows = [["Role", "Person", ...gates.map((gate) => gate.title)]];
+  state.raci.roles.forEach((role) => rows.push([role.role, role.person, ...role.assignments]));
+  downloadText("raci.csv", toCsv(rows), "text/csv");
+}
+
+function downloadJson() {
+  downloadText("commercialization-os-backup.json", JSON.stringify(state, null, 2), "application/json");
+}
+
+function importJson() {
+  const message = document.querySelector("#adminMessage");
+  try {
+    state = normalizeState(JSON.parse(document.querySelector("#importJson").value));
+    activeProductId = state.activeProductId;
+    activePage = state.activePage;
+    saveState();
+    message.textContent = "Backup imported.";
+    render();
+  } catch {
+    message.textContent = "That backup could not be imported.";
+  }
+}
+
+function toCsv(rows) {
+  return rows.map((row) => row.map((cell) => `"${String(cell ?? "").replaceAll('"', '""')}"`).join(",")).join("\n");
+}
+
+function downloadText(filename, content, type) {
+  const blob = new Blob([content], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
+function statusClass(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replaceAll("/", "")
+    .replaceAll(" ", "-");
 }
 
 function money(value) {
@@ -644,7 +908,7 @@ function money(value) {
 }
 
 function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (char) => ({
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
     "&": "&amp;",
     "<": "&lt;",
     ">": "&gt;",
