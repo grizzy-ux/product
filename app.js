@@ -158,6 +158,15 @@ document.querySelector("#exportRaciBtn").addEventListener("click", exportRaciCsv
 document.querySelector("#downloadJsonBtn").addEventListener("click", downloadJson);
 document.querySelector("#importJsonBtn").addEventListener("click", importJson);
 document.querySelector("#detailOpenPipelineBtn").addEventListener("click", () => setPage("pipeline"));
+document.querySelector("#detailProductName").addEventListener("input", () => {
+  const product = getActiveProduct();
+  product.name = document.querySelector("#detailProductName").value;
+  document.querySelector("#detailTitle").textContent = product.name || "Untitled product";
+  productName.value = product.name;
+  saveState();
+  renderProducts();
+  renderSummary();
+});
 
 navButtons.forEach((button) => button.addEventListener("click", () => setPage(button.dataset.page)));
 
@@ -552,6 +561,7 @@ function renderDetail(product) {
   currentStatus.className = `status-pill ${statusClass(currentGateStatus(product))}`;
   setSelectOptions(document.querySelector("#detailPackagingStatus"), statusValues, product.details.packagingStatus);
   setSelectOptions(document.querySelector("#detailTestingStatus"), statusValues, product.details.testingStatus);
+  document.querySelector("#detailProductName").value = product.name || "";
   document.querySelector("#detailVendor").value = product.details.vendor || "";
   document.querySelector("#detailFormulaRound").value = product.details.formulaRound || "";
   document.querySelector("#detailLaunch").value = product.targetLaunch || "";

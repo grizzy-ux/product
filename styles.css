@@ -760,7 +760,8 @@ button:disabled {
   outline: none;
 }
 
-.detail-grid label:nth-child(6) {
+.detail-grid label:first-child,
+.detail-grid label:nth-child(7) {
   grid-column: 1 / -1;
 }
 
