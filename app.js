@@ -367,16 +367,47 @@ function renderPage() {
 function renderProducts() {
   productList.innerHTML = "";
   state.products.forEach((product) => {
-    const button = document.createElement("button");
-    button.className = `product-tab${product.id === activeProductId ? " active" : ""}`;
-    button.type = "button";
-    button.innerHTML = `<strong>${escapeHtml(product.name || "Untitled product")}</strong><span>${gates[product.currentGate]?.title || "Complete"} · ${currentGateStatus(product)}</span>`;
-    button.addEventListener("click", () => {
+    const card = document.createElement("div");
+    card.className = `product-card${product.id === activeProductId ? " active" : ""}`;
+
+    const openButton = document.createElement("button");
+    openButton.className = "product-tab";
+    openButton.type = "button";
+    openButton.innerHTML = `<strong>${escapeHtml(product.name || "Untitled product")}</strong><span>${gates[product.currentGate]?.title || "Complete"} · ${currentGateStatus(product)}</span>`;
+    openButton.addEventListener("click", () => {
       activeProductId = product.id;
       activePage = "detail";
       persistAndRender();
     });
-    productList.append(button);
+
+    const editRow = document.createElement("div");
+    editRow.className = "product-card-controls";
+
+    const nameInput = document.createElement("input");
+    nameInput.value = product.name || "";
+    nameInput.placeholder = "Product name";
+    nameInput.addEventListener("input", () => {
+      product.name = nameInput.value;
+      if (product.id === activeProductId) {
+        productName.value = product.name;
+        const detailName = document.querySelector("#detailProductName");
+        if (detailName) detailName.value = product.name;
+        document.querySelector("#detailTitle").textContent = product.name || "Untitled product";
+      }
+      saveState();
+      renderSummary();
+    });
+
+    const removeButton = document.createElement("button");
+    removeButton.className = "remove-product-button";
+    removeButton.type = "button";
+    removeButton.textContent = "Remove";
+    removeButton.disabled = state.products.length === 1;
+    removeButton.addEventListener("click", () => removeProduct(product.id));
+
+    editRow.append(nameInput, removeButton);
+    card.append(openButton, editRow);
+    productList.append(card);
   });
 }
 
@@ -900,6 +931,22 @@ function addProduct() {
   state.products.unshift(product);
   activeProductId = product.id;
   activePage = "detail";
+  persistAndRender();
+}
+
+function removeProduct(productId) {
+  if (state.products.length === 1) return;
+  const product = state.products.find((item) => item.id === productId);
+  const confirmed = window.confirm(`Remove ${product?.name || "this product"}? This only deletes it from this browser's saved workspace.`);
+  if (!confirmed) return;
+
+  const removedIndex = state.products.findIndex((item) => item.id === productId);
+  state.products = state.products.filter((item) => item.id !== productId);
+  if (activeProductId === productId) {
+    const nextProduct = state.products[Math.min(removedIndex, state.products.length - 1)] || state.products[0];
+    activeProductId = nextProduct.id;
+    activePage = "summary";
+  }
   persistAndRender();
 }
 
