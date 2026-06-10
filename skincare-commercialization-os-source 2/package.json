@@ -1,0 +1,10 @@
+{
+  "name": "skincare-stage-gate-manager",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Static browser app for skincare product stage gates and RACI planning.",
+  "scripts": {
+    "check": "node --check app.js",
+    "start": "python3 -m http.server 4173"
+  }
+}
